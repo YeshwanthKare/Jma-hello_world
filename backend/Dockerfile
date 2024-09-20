@@ -7,7 +7,7 @@ RUN addgroup -S jma && adduser -S jma_app_user -G jma
 WORKDIR /app
 
 # Copy package files and install dependencies
-COPY backend/package*.json .
+COPY backend/package.json .
 
 RUN npm install
 
