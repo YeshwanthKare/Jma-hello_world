@@ -16,4 +16,5 @@ USER jma_app_user
 # Expose the Nginx port
 EXPOSE 80
 
-# Command to run Nginx (default command is already set in the base image)
+# Command to run Nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]
