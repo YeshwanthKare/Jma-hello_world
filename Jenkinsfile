@@ -1,103 +1,87 @@
+@Library('Shared') _
 pipeline {
     agent any
-
-    // environment {
-    //     SONAR_HOST_URL = 'http://54.166.69.79:9000/'
-    //     SONAR_PROJECT_KEY = 'Jma-hello_world'
-    //     SONAR_PROJECT_NAME = 'Jma-hello_world'
-    //     SONAR_TOKEN = credentials('squ_ee04cfb80000d56afb433af9789548e19ab82051') // Jenkins credential with SonarQube token
-    // }
-
-    tools {
-        maven 'Maven3' // Make sure "Maven3" is configured in Jenkins Global Tool Configuration
+    
+    environment{
+        SONAR_HOME = tool "Sonar"
     }
 
+    
     stages {
-        // Move the Workspace cleanup stage inside the stages block
-        stage('Workspace Cleanup') {
+        
+        stage("Workspace cleanup"){
+            steps{
+                script{
+                    cleanWs()
+                }
+            }
+        }
+        
+        stage('Git: Code Checkout') {
             steps {
-                script {
-                    cleanWs() // Clean up the workspace
+                script{
+                    code_checkout("https://github.com/YeshwanthKare/Jma-hello_world.git","main")
+                }
+            }
+        }
+        
+        stage("Trivy: Filesystem scan"){
+            steps{
+                script{
+                    trivy_scan()
                 }
             }
         }
 
-        stage('Checkout') {
-            steps {
-                git url: 'https://github.com/YeshwanthKare/Jma-hello_world.git', branch: 'main'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                script {
-                    def os = System.properties['os.name'].toLowerCase()
-                    echo "OS: ${os}"
-
-                    // Run the appropriate build command based on the OS
-                    if (os.contains("linux")) {
-                        sh "mvn clean install -DskipTests"
-                    } else {
-                        bat "mvn clean install -DskipTests"
-                    }
+        stage("OWASP: Dependency check"){
+            steps{
+                script{
+                    owasp_dependency()
                 }
             }
         }
-
-        stage('Build Frontend') {
-            steps {
-                script {
-                    sh 'cd frontend && docker build -t jma-frontend .'
+        
+        stage("SonarQube: Code Analysis"){
+            steps{
+                script{
+                    sonarqube_analysis("Sonar","Jma-hello_world","Jma-hello_world")
                 }
             }
         }
-
-        stage('Build Backend') {
-            steps {
-                script {
-                    sh 'cd backend && docker build -t jma-backend .'
+        
+        stage("SonarQube: Code Quality Gates"){
+            steps{
+                script{
+                    sonarqube_code_quality()
                 }
             }
         }
-
-        // stage('SonarQube Analysis') {
-        //     steps {
-        //         script {
-        //             // Run SonarQube analysis
-        //             sh """
-        //             mvn sonar:sonar \
-        //                 -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-        //                 -Dsonar.host.url=${SONAR_HOST_URL} \
-        //                 -Dsonar.login=${SONAR_TOKEN}
-        //             """
-        //         }
-        //     }
-        // }
-
-        stage('OWASP Dependency Check') {
-            steps {
-                script {
-                    // Ensure OWASP dependency check script is available on the agent
-                    sh 'dependency-check.sh --project "Jma-hello_world" --scan .'
+        
+        
+        stage("Docker: Build Images"){
+            steps{
+                script{
+                        dir('backend'){
+                            docker_build("jma-backend","latest","yeshid")
+                        }
+                    
+                        dir('frontend'){
+                            docker_build("jma-frontend","latest","yeshid")
+                        }
                 }
             }
         }
-
-        stage('Deploy Locally') {
-            steps {
-                script {
-                    // Start the containers using docker-compose
-                    sh 'docker-compose up -d'
+        
+        stage("Docker: Push to DockerHub"){
+            steps{
+                script{
+                    docker_push("jma-backend","latest","yeshid") 
+                    docker_push("jma-frontend","latest","yeshid")
                 }
             }
         }
     }
-
-    post {
-        // always {
-        //     echo 'Cleaning up workspace...'
-        //     cleanWs() // Ensure cleanWs is within a node context
-        // }
+    post{
         success {
             echo 'Pipeline completed successfully.'
         }
