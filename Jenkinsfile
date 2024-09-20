@@ -53,6 +53,7 @@ pipeline {
             steps{
                 script{
                     sonarqube_code_quality()
+					waitForQualityGate(timeout: 10) // Wait for up to 10 minutes for the quality gate status
                 }
             }
         }
