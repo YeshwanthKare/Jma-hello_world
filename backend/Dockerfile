@@ -12,7 +12,7 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the rest of the application code
-COPY backend .
+COPY . .
 
 # Change ownership of the application files to the new user
 RUN chown -R jma_app_user:jma .
