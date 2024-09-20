@@ -7,15 +7,15 @@ RUN addgroup -S jma && adduser -S jma_app_user -G jma
 WORKDIR /app
 
 # Copy package files and install dependencies
-# COPY backend/package*.json /app
+COPY backend/package*.json .
 
 RUN npm install
 
 # Copy the rest of the application code
-COPY backend /app
+COPY backend .
 
 # Change ownership of the application files to the new user
-RUN chown -R jma_app_user:jma /app
+RUN chown -R jma_app_user:jma .
 
 # Switch to the non-root user
 USER jma_app_user
