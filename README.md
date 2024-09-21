@@ -38,6 +38,10 @@ echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main |
 sudo apt-get update -y
 sudo apt-get install trivy -y
 
+// Install and Configure SonarQube
+
+docker run -itd --name SonarQube-Server -p 9000:9000 sonarqube:lts-community
+
 // problems
 
 sudo usermod -aG docker jenkins
