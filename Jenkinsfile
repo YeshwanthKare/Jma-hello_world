@@ -2,9 +2,9 @@
 pipeline {
     agent any
     
-    // environment{
-    //     SONAR_HOME = tool "Sonar"
-    // }
+    environment{
+        SONAR_HOME = tool "Sonar"
+    }
 
     
     stages {
@@ -43,22 +43,22 @@ pipeline {
         
         
         
-        // stage("SonarQube: Code Analysis"){
-        //     steps{
-        //         script{
-        //             sonarqube_analysis("Sonar","Jma-hello_world","Jma-hello_world")
-        //         }
-        //     }
-        // }
+        stage("SonarQube: Code Analysis"){
+            steps{
+                script{
+                    sonarqube_analysis("Sonar","Jma-hello_world","Jma-hello_world")
+                }
+            }
+        }
         
-        // stage("SonarQube: Code Quality Gates"){
-        //     steps{
-        //         script{
-        //             sonarqube_code_quality()
-        //             waitForQualityGate(timeout: 10) // Wait for up to 10 minutes for the quality gate status
-        //         }
-        //     }
-        // }
+        stage("SonarQube: Code Quality Gates"){
+            steps{
+                script{
+                    sonarqube_code_quality()
+                    waitForQualityGate(timeout: 10) // Wait for up to 10 minutes for the quality gate status
+                }
+            }
+        }
         
         
         stage("Docker: Build Images"){
