@@ -42,7 +42,7 @@ sudo apt-get install trivy -y
 
 docker run -itd --name SonarQube-Server -p 9000:9000 sonarqube:lts-community
 
-//Jenkins Shared Library
+// Jenkins Shared Library
 
 https://github.com/YeshwanthKare/Jenkins_SharedLib
 
