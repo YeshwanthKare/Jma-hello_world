@@ -37,3 +37,18 @@ wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-k
 echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
 sudo apt-get update -y
 sudo apt-get install trivy -y
+
+// problems
+
+sudo usermod -aG docker jenkins
+
+sudo systemctl restart jenkins
+
+docker run -d \
+ -v /var/run/docker.sock:/var/run/docker.sock \
+ -v jenkins_home:/var/jenkins_home \
+ jenkins/jenkins:lts
+
+ls -l /var/run/docker.sock
+
+sudo apt-get install docker.io
